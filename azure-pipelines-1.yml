@@ -8,44 +8,74 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+
 steps:
-# Install OWASP ZAP
+# Install Docker
 - script: |
     sudo apt-get update
-    sudo apt-get install -y wget openjdk-11-jre
-    wget https://github.com/zaproxy/zaproxy/releases/download/v2.15.0/ZAP_2_15_0_unix.sh
-    chmod +x ZAP_2_15_0_unix.sh
-    sudo ./ZAP_2_15_0_unix.sh -q -dir /opt/zap
-    if [ -L /usr/local/bin/zap.sh ]; then
-        sudo rm /usr/local/bin/zap.sh
-    fi
-    sudo ln -s /opt/zap/zap.sh /usr/local/bin/zap.sh
-  displayName: 'Install OWASP ZAP'
-  
-# Install zap-cli
-- script: |
-    sudo apt-get install -y python3-pip
-    pip3 install zapcli
-    echo teste
-  displayName: 'Install zap-cli'
+    sudo apt-get install -y docker.io
+  displayName: 'Install Docker'
 
-# Start OWASP ZAP in daemon mode and run scan
+# Pull and Run OWASP ZAP Docker container
 - script: |
-    /opt/zap/zap.sh -daemon -host 127.0.0.1 -port 8080
+    sudo docker pull owasp/zap2docker-stable
+    sudo docker run -d --name zap -u root -p 8080:8080 -i owasp/zap2docker-stable zap.sh -daemon -host 0.0.0.0 -port 8080
     echo "Waiting for ZAP to start..."
     sleep 60  # Wait for ZAP to start
-    echo "Checking ZAP status..."
-    zap-cli status -t 120  # Wait up to 2 minutes for ZAP to be ready
-    echo "Opening URL..."
-    zap-cli open-url https://www.t2mlab.com/
-    echo "Running spider..."
-    zap-cli spider https://www.t2mlab.com/
-    echo "Running active scan..."
-    zap-cli active-scan https://www.t2mlab.com/
-    echo "Generating reports..."
-    zap-cli report -o owaspzap/report.json -f json
-    zap-cli report -o owaspzap/report.html -f html
+  displayName: 'Pull and Start OWASP ZAP Docker Container'
+
+# Run OWASP ZAP Scan
+- script: |
+    echo "Running OWASP ZAP scan..."
+    sudo docker exec zap zap-cli status -t 120  # Wait up to 2 minutes for ZAP to be ready
+    sudo docker exec zap zap-cli open-url https://www.t2mlab.com/
+    sudo docker exec zap zap-cli spider https://www.t2mlab.com/
+    sudo docker exec zap zap-cli active-scan https://www.t2mlab.com/
+    sudo docker exec zap zap-cli report -o /zap/wrk/report.json -f json
+    sudo docker exec zap zap-cli report -o /zap/wrk/report.html -f html
+    sudo docker cp zap:/zap/wrk/report.json owaspzap/report.json
+    sudo docker cp zap:/zap/wrk/report.html owaspzap/report.html
   displayName: 'Run ZAP OWASP Scan'
+
+
+# steps:
+# # Install OWASP ZAP
+# - script: |
+#     sudo apt-get update
+#     sudo apt-get install -y wget openjdk-11-jre
+#     wget https://github.com/zaproxy/zaproxy/releases/download/v2.15.0/ZAP_2_15_0_unix.sh
+#     chmod +x ZAP_2_15_0_unix.sh
+#     sudo ./ZAP_2_15_0_unix.sh -q -dir /opt/zap
+#     if [ -L /usr/local/bin/zap.sh ]; then
+#         sudo rm /usr/local/bin/zap.sh
+#     fi
+#     sudo ln -s /opt/zap/zap.sh /usr/local/bin/zap.sh
+#   displayName: 'Install OWASP ZAP'
+  
+# # Install zap-cli
+# - script: |
+#     sudo apt-get install -y python3-pip
+#     pip3 install zapcli
+#     echo teste
+#   displayName: 'Install zap-cli'
+
+# # Start OWASP ZAP in daemon mode and run scan
+# - script: |
+#     /opt/zap/zap.sh -daemon -host 127.0.0.1 -port 8080
+#     echo "Waiting for ZAP to start..."
+#     sleep 60  # Wait for ZAP to start
+#     echo "Checking ZAP status..."
+#     zap-cli status -t 120  # Wait up to 2 minutes for ZAP to be ready
+#     echo "Opening URL..."
+#     zap-cli open-url https://www.t2mlab.com/
+#     echo "Running spider..."
+#     zap-cli spider https://www.t2mlab.com/
+#     echo "Running active scan..."
+#     zap-cli active-scan https://www.t2mlab.com/
+#     echo "Generating reports..."
+#     zap-cli report -o owaspzap/report.json -f json
+#     zap-cli report -o owaspzap/report.html -f html
+#   displayName: 'Run ZAP OWASP Scan'
 
 - script: |
     echo Add other tasks to build, test, and deploy your project.
