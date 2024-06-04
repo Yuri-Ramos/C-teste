@@ -9,13 +9,6 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-# # Install .NET SDK (if needed for your project)
-# - task: UseDotNet@2
-#   inputs:
-#     packageType: 'sdk'
-#     version: '7.x'
-#   displayName: 'Install .NET SDK'
-
 # Install OWASP ZAP
 - script: |
     sudo apt-get update
@@ -29,16 +22,12 @@ steps:
     sudo ln -s /opt/zap/zap.sh /usr/local/bin/zap.sh
   displayName: 'Install OWASP ZAP'
   
-  # Install zap-cli
+# Install zap-cli
 - script: |
     sudo apt-get install -y python3-pip
     pip3 install zapcli
+    echo teste
   displayName: 'Install zap-cli'
-
-
-- script: |
-    /bin/bash -c "zap-cli -host 127.0.0.1 -port 8080 -config -autoUpdate -confirm -quickScan -target "https://www.t2mlab.com/" -report -o owaspzap/report.json -f json -report -o owaspzap/report.html -f html"
-  displayName: 'Run ZAP OWASP Scan'
 
 - script: |
     echo Add other tasks to build, test, and deploy your project.
