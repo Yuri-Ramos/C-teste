@@ -29,6 +29,12 @@ steps:
     sudo ln -s /opt/zap/zap.sh /usr/local/bin/zap.sh
   displayName: 'Install OWASP ZAP'
   
+  # Install zap-cli
+- script: |
+    sudo apt-get install -y python3-pip
+    pip3 install zapcli
+  displayName: 'Install zap-cli'
+
 - script: |
     echo Add other tasks to build, test, and deploy your project.
     echo See https://aka.ms/yaml
