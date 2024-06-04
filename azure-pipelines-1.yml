@@ -9,12 +9,12 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-# Install .NET SDK (if needed for your project)
-- task: UseDotNet@2
-  inputs:
-    packageType: 'sdk'
-    version: '7.x'
-  displayName: 'Install .NET SDK'
+# # Install .NET SDK (if needed for your project)
+# - task: UseDotNet@2
+#   inputs:
+#     packageType: 'sdk'
+#     version: '7.x'
+#   displayName: 'Install .NET SDK'
 
 # Install OWASP ZAP
 - script: |
