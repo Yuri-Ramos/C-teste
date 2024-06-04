@@ -35,19 +35,10 @@ steps:
     pip3 install zapcli
   displayName: 'Install zap-cli'
 
-# Run ZAP OWASP Scan
-- script: |
-    /opt/zap/zap.sh -daemon -host 127.0.0.1 -port 8080
-    sleep 60  # Wait for ZAP to start
-    zap-cli status -t 120  # Wait up to 2 minutes for ZAP to be ready
-    zap-cli open-url https://www.t2mlab.com/
-    zap-cli spider https://www.t2mlab.com/
-    zap-cli active-scan https://www.t2mlab.com/
-    zap-cli report -o owaspzap/report.json -f json
-    zap-cli report -o owaspzap/report.html -f html
-    zap-cli shutdown
-  displayName: 'Run ZAP OWASP Scan'
 
+- script: |
+    zap-cli -host 127.0.0.1 -port 8080 -config -autoUpdate -confirm -quickScan -target "https://www.t2mlab.com/" -report -o owaspzap/report.json -f json -report -o owaspzap/report.html -f html
+  displayName: 'Run ZAP OWASP Scan'
 - script: |
     echo Add other tasks to build, test, and deploy your project.
     echo See https://aka.ms/yaml
