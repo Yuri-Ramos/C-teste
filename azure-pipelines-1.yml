@@ -12,7 +12,18 @@ pool:
 steps:
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
+  
 
+# Install OWASP ZAP
+- script: |
+    sudo apt-get update
+    sudo apt-get install -y wget openjdk-11-jre
+    wget https://github.com/zaproxy/zaproxy/releases/download/v2.15.0/ZAP_2_15_0_unix.sh
+    chmod +x ZAP_2_15_0_unix.sh
+    sudo ./ZAP_2_15_0_unix.sh -q -dir /opt/zap
+    sudo ln -s /opt/zap/zap.sh /usr/local/bin/zap.sh
+  displayName: 'Install OWASP ZAP'
+  
 - script: |
     echo Add other tasks to build, test, and deploy your project.
     echo See https://aka.ms/yaml
