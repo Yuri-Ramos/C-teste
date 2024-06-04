@@ -37,8 +37,9 @@ steps:
 
 
 - script: |
-    zap-cli -host 127.0.0.1 -port 8080 -config -autoUpdate -confirm -quickScan -target "https://www.t2mlab.com/" -report -o owaspzap/report.json -f json -report -o owaspzap/report.html -f html
+    /bin/bash -c "zap-cli -host 127.0.0.1 -port 8080 -config -autoUpdate -confirm -quickScan -target "https://www.t2mlab.com/" -report -o owaspzap/report.json -f json -report -o owaspzap/report.html -f html"
   displayName: 'Run ZAP OWASP Scan'
+
 - script: |
     echo Add other tasks to build, test, and deploy your project.
     echo See https://aka.ms/yaml
