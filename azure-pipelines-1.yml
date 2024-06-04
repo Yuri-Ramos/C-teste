@@ -2,7 +2,6 @@
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
-
 trigger:
 - main
 
@@ -10,9 +9,12 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-  
+# Install .NET SDK (if needed for your project)
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '7.x'
+  displayName: 'Install .NET SDK'
 
 # Install OWASP ZAP
 - script: |
@@ -21,6 +23,9 @@ steps:
     wget https://github.com/zaproxy/zaproxy/releases/download/v2.15.0/ZAP_2_15_0_unix.sh
     chmod +x ZAP_2_15_0_unix.sh
     sudo ./ZAP_2_15_0_unix.sh -q -dir /opt/zap
+    if [ -L /usr/local/bin/zap.sh ]; then
+        sudo rm /usr/local/bin/zap.sh
+    fi
     sudo ln -s /opt/zap/zap.sh /usr/local/bin/zap.sh
   displayName: 'Install OWASP ZAP'
   
