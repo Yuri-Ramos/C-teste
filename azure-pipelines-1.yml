@@ -10,33 +10,34 @@ pool:
 
 
 steps:
-# Install Docker
+# Install OWASP ZAP
 - script: |
     sudo apt-get update
-    sudo apt-get install -y docker.io
-  displayName: 'Install Docker'
+    sudo apt-get install -y wget openjdk-11-jre
+    wget https://github.com/zaproxy/zaproxy/releases/download/v2.15.0/ZAP_2_15_0_unix.sh
+    chmod +x ZAP_2_15_0_unix.sh
+    sudo ./ZAP_2_15_0_unix.sh -q -dir /opt/zap
+    if [ -L /usr/local/bin/zap.sh ]; then
+        sudo rm /usr/local/bin/zap.sh
+    fi
+    sudo ln -s /opt/zap/zap.sh /usr/local/bin/zap.sh
+  displayName: 'Install OWASP ZAP'
 
-# Pull and Run OWASP ZAP Docker container
+# Install zap-cli
 - script: |
-    sudo docker pull owasp/zap2docker-stable
-    sudo docker run -d --name zap -u root -p 8080:8080 -i owasp/zap2docker-stable zap.sh -daemon -host 0.0.0.0 -port 8080
-    echo "Waiting for ZAP to start..."
-    sleep 60  # Wait for ZAP to start
-  displayName: 'Pull and Start OWASP ZAP Docker Container'
+    sudo apt-get install -y python3-pip
+    pip3 install zapcli
+  displayName: 'Install zap-cli'
 
-# Run OWASP ZAP Scan
+#teste
 - script: |
-    echo "Running OWASP ZAP scan..."
-    sudo docker exec zap zap-cli status -t 120  # Wait up to 2 minutes for ZAP to be ready
-    sudo docker exec zap zap-cli open-url https://www.t2mlab.com/
-    sudo docker exec zap zap-cli spider https://www.t2mlab.com/
-    sudo docker exec zap zap-cli active-scan https://www.t2mlab.com/
-    sudo docker exec zap zap-cli report -o /zap/wrk/report.json -f json
-    sudo docker exec zap zap-cli report -o /zap/wrk/report.html -f html
-    sudo docker cp zap:/zap/wrk/report.json owaspzap/report.json
-    sudo docker cp zap:/zap/wrk/report.html owaspzap/report.html
-  displayName: 'Run ZAP OWASP Scan'
+    echo" ----------------------------------------rodou até aqui"
+  displayName: 'rodou'
 
+- script: |
+    echo Add other tasks to build, test, and deploy your project.
+    echo See https://aka.ms/yaml
+  displayName: 'Run a multi-line script'
 
 # steps:
 # # Install OWASP ZAP
@@ -77,7 +78,3 @@ steps:
 #     zap-cli report -o owaspzap/report.html -f html
 #   displayName: 'Run ZAP OWASP Scan'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
