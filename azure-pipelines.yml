@@ -20,4 +20,11 @@ steps:
 - task: OwaspZapOnPremiseStart@0
   inputs:
     PortZapProxy: '$(80)'
-    KeyOwaspZapProxy: '$(1234567890)'
+    KeyOwaspZapProxy: '$(1234567899999)'
+    ControlMode: 'safe'
+- task: OwaspZapOnPremiseStop@0
+  inputs:
+    OwaspZapUrl: 'http://localhost:80'
+    PortZapProxy: '$(80)'
+    KeyOwaspZapProxy: '$(1234567899999)'
+    ProcessXmlReportAsTest: 'No'
