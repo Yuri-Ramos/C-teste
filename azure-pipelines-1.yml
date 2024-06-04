@@ -45,6 +45,7 @@ steps:
     zap-cli active-scan https://www.t2mlab.com/
     zap-cli report -o owaspzap/report.json -f json
     zap-cli report -o owaspzap/report.html -f html
+    zap-cli shutdown
   displayName: 'Run ZAP OWASP Scan'
 
 - script: |
