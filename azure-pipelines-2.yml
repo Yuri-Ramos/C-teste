@@ -1,0 +1,57 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+parameters:
+  - name: dot_net_core_version
+    type: string
+    default: '6.x'
+
+jobs:
+- job: Build_Gated_NetCore
+  displayName: 'Build_Gated_NetCore Job'
+  pool:
+    vmImage: ubuntu-latest
+  variables:
+    buildConfiguration: 'Release'
+ 
+  steps:
+
+  # - task: SonarQubePrepare@5
+  #   displayName: 'Prepare analysis on SonarQube'
+  #   inputs:
+  #     SonarQube: 'SonarQube_Server_Connection_Name' 
+  - task: UseDotNet@2
+    displayName: 'use dotnet ${{ parameters.dot_net_core_version }}'
+    inputs:
+      packageType: 'sdk'
+      version: '${{ parameters.dot_net_core_version }}'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet restore'
+    inputs:
+      command: 'restore'
+      projects: '**/*.csproj'
+      feedsToUse: 'select'
+      includeNuGetOrg: true 
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet build'
+    inputs:
+      command: 'build'
+      projects: '**/*.csproj'
+      arguments: '--configuration release --no-restore'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet test'
+    inputs:
+      command: 'test'
+      projects: '**/*.csproj'
+      arguments: '--configuration release --no-restore --collect "Cove Coverage"'
+      publishTestResults: true
+
+  # - task: SonarQubeAnalyze@5
+  #   displayName: 'Run Code Analysis'
+  
+  # - task: SonarQubePublish@5
+  #   displayName: 'Publish Quality Gate Result'
